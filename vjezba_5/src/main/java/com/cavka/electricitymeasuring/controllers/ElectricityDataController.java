@@ -3,6 +3,7 @@ package com.cavka.electricitymeasuring.controllers;
 import com.cavka.electricitymeasuring.entities.ElectricityData;
 import com.cavka.electricitymeasuring.services.ElectricityDataService;
 import lombok.AllArgsConstructor;
+import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,7 @@ import java.util.*;
 @AllArgsConstructor
 @RestController
 public class ElectricityDataController {
-    @Autowired
+
     private ElectricityDataService service;
 
     @GetMapping()
@@ -31,7 +32,7 @@ public class ElectricityDataController {
 
     @GetMapping(value="/year")//triba ić sve u jedan isti path, ali sa različitim parametrima - hash map
     @ResponseBody
-    public  ResponseEntity<String> getYear(@RequestParam("year") Integer searchYear){
+    public  ResponseEntity<JSONObject> getYear(@RequestParam("year") Integer searchYear){
             try{
                 List<ElectricityData> allData = service.findAll();
                 double sumAll = 0.0;
@@ -43,8 +44,11 @@ public class ElectricityDataController {
                         sumAll = Double.sum(sumAll,data.getValue());
                     }
                 }
-                System.out.print("year " + searchYear + " total spent " + sumAll);
-                return new ResponseEntity<>("year " + searchYear + " total spent " + sumAll,HttpStatus.OK);
+                Map<String, Object> map = new HashMap<>();
+                map.put("year", searchYear);
+                map.put("sum", sumAll);
+                JSONObject json = new JSONObject(map);
+                return new ResponseEntity<>(json,HttpStatus.OK);
             }
             catch (NoSuchElementException e){
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -52,7 +56,7 @@ public class ElectricityDataController {
         }
 
     @RequestMapping(value="/year+month", method=RequestMethod.GET) //@ResponseBody
-    public  ResponseEntity<String> getYearAndMonth(@RequestParam("year") Integer searchYear, @RequestParam("month") Integer searchMonth) {
+    public  ResponseEntity<JSONObject> getYearAndMonth(@RequestParam("year") Integer searchYear, @RequestParam("month") Integer searchMonth) {
             try{
                 List<ElectricityData> allData = service.findAll();
                 double sumAll = 0.0;
@@ -66,17 +70,21 @@ public class ElectricityDataController {
                         sumAll = Double.sum(sumAll,data.getValue());
                     }
                 }
-                System.out.print("year " + searchYear + " month " + searchMonth + " total spent " + sumAll);
-                return new ResponseEntity<>("year " + searchYear + " month " + searchMonth + " total spent " + sumAll,HttpStatus.OK);
+                Map<String, Object> map = new HashMap<>();
+                map.put("year", searchYear);
+                map.put("month",searchMonth);
+                map.put("sum", sumAll);
+                JSONObject json = new JSONObject(map);
+                return new ResponseEntity<>(json,HttpStatus.OK);
             }
             catch (NoSuchElementException e){
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
     }
 
-    @GetMapping(value="/all_year") //vratit json, priko hash mape
+    @GetMapping(value="/all-year")
     @ResponseBody
-    public  ResponseEntity<String> getYearByMonths(@RequestParam("year") Integer searchYear) {
+    public  ResponseEntity<JSONObject> getYearByMonths(@RequestParam("year") Integer searchYear) {
         try {
             List<ElectricityData> allData = service.findAll();
             double sum1 = 0;
@@ -140,50 +148,24 @@ public class ElectricityDataController {
                     }
                 }
             }
-            String message = "year " + searchYear + " by month: ";
-            for (int i = 1; i <= 12; i++) {
-                switch (i) {
-                    case 1:
-                        message += "\nJanuary: " + sum1;
-                        break;
-                    case 2:
-                        message += "\nFebruary: " + sum2;
-                        break;
-                    case 3:
-                        message += "\nMarch: " + sum3;
-                        break;
-                    case 4:
-                        message += "\nApril: " + sum4;
-                        break;
-                    case 5:
-                        message += "\nMay: " + sum5;
-                        break;
-                    case 6:
-                        message += "\nJune: " + sum6;
-                        break;
-                    case 7:
-                        message += "\nJuly: " + sum7;
-                        break;
-                    case 8:
-                        message += "\nAugust: " + sum8;
-                        break;
-                    case 9:
-                        message += "\nSeptember: " + sum9;
-                        break;
-                    case 10:
-                        message += "\nOctober: " + sum10;
-                        break;
-                    case 11:
-                        message += "\nNovember: " + sum11;
-                        break;
-                    case 12:
-                        message += "\nDecember: " + sum12;
-                        break;
-                    default:
-                        break;
-                }
-            }
-            return new ResponseEntity<>(message, HttpStatus.OK);
+            Map<String, Object> map = new HashMap<>();
+            map.put("year", searchYear);
+            Map<String, Object> mapMonths = new HashMap<>();
+            mapMonths.put("January",sum1);
+            mapMonths.put("February",sum2);
+            mapMonths.put("March",sum3);
+            mapMonths.put("April",sum4);
+            mapMonths.put("May",sum5);
+            mapMonths.put("June",sum6);
+            mapMonths.put("July",sum7);
+            mapMonths.put("August",sum8);
+            mapMonths.put("September",sum9);
+            mapMonths.put("October",sum10);
+            mapMonths.put("November",sum11);
+            mapMonths.put("December",sum12);
+            map.put("month", mapMonths);
+            JSONObject json = new JSONObject(map);
+            return new ResponseEntity<>(json,HttpStatus.OK);
         }
         catch (NoSuchElementException e){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
