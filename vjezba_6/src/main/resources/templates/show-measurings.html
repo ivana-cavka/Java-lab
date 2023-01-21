@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="https://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Measurings</title>
+    <link rel="stylesheet" th:href="@{/css/jquery-ui.css}" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <style>
+        th {
+            padding: 10px;
+        }
+        td {
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+<h1 style="margin:50px">Measurings</h1>
+<hr/>
+<table border="1" style="margin:50px">
+    <thead>
+    <th>Value</th>
+    <th>Time</th>
+    <th>Date</th>
+    <th>Device</th>
+    <th>Client</th>
+    </thead>
+    <tbody>
+    <tr th:each="measuring: ${measurings}">
+        <td th:text="${measuring.value}"></td>
+        <td th:text="${measuring.time}"></td>
+        <td th:text="${measuring.date}"></td>
+        <td th:text="${measuring.device.name}"></td>
+        <td><span th:text="${measuring.device.client.firstName}"></span> <span th:text="${measuring.device.client.lastName}"></span></td>
+    </tr>
+    </tbody>
+</table>
+<br></br>
+<div style="margin:50px">
+    <a th:href="@{/input-measuring}">Add New Measuring</a>
+</div>
+</body>
+</html>
